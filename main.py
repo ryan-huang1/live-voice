@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
+import json
 import vonage
 from dotenv import load_dotenv
 import os
@@ -20,7 +21,7 @@ client = vonage.Client(
     private_key=API_KEY_PATH,
 )
 
-server_remote_url="https://d075-2603-6080-5a03-db44-f15a-4024-8474-e8a9.ngrok-free.app/"
+server_remote_url = "https://d075-2603-6080-5a03-db44-f15a-4024-8474-e8a9.ngrok-free.app/"
 
 @app.route('/webhooks/answer', methods=['GET'])
 def answer_call():
@@ -34,13 +35,14 @@ def answer_call():
             'eventUrl': [f"{server_remote_url}webhooks/input"],
             'type': ['speech'],
             'speech': {
-                'uuid': [request.args['uuid']],
+                'uuid': [request.args.get('uuid')],
                 'endOnSilence': 3,
                 'language': 'en-US'
             }
         }
     ]
-    return jsonify(ncco)
+    return Response(json.dumps(ncco), mimetype='application/json')
+
 
 @app.route('/webhooks/event', methods=['POST'])
 def events():
@@ -49,11 +51,22 @@ def events():
 
 @app.route('/webhooks/input', methods=['POST'])
 def handle_input():
-    # Capture the speech results and respond
     print("Input received:", request.json)
     speech_results = request.json.get('speech', {}).get('results', [])
-    response_text = 'You said nothing recognizable.' if not speech_results else f'You said: {speech_results[0].get("text")}.'
-    response_ncco = [{'action': 'talk', 'text': response_text}]
+    response_text = 'You said nothing recognizable.' if not speech_results else f'You said: {speech_results[0].get("text")}. Please say something else.'
+    response_ncco = [
+        {'action': 'talk', 'text': response_text},
+        {
+            'action': 'input',
+            'eventUrl': [f"{server_remote_url}webhooks/input"],
+            'type': ['speech'],
+            'speech': {
+                'uuid': [request.json['uuid']],
+                'endOnSilence': 3,
+                'language': 'en-US'
+            }
+        }
+    ]
     return jsonify(response_ncco)
 
 @app.route('/make-call', methods=['GET'])
