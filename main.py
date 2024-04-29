@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, send_from_directory
 import json
 import vonage
 from dotenv import load_dotenv
@@ -21,14 +21,26 @@ client = vonage.Client(
     private_key=API_KEY_PATH,
 )
 
-server_remote_url = "https://d075-2603-6080-5a03-db44-f15a-4024-8474-e8a9.ngrok-free.app/"
+server_remote_url = "https://d805-2603-6080-5a03-db44-f15a-4024-8474-e8a9.ngrok-free.app/"
+
+# Define the path to your MP3 file and its directory
+AUDIO_FILE_PATH = '/Users/ryanhuang/Documents/GitHub/live-voice/audio_files'
+AUDIO_FILE_NAME = '127b95ac-dcec-497f-a9a8-f753d3940d8c.mp3'
+
+@app.route('/hello-audio')
+def serve_audio():
+    """
+    Serve the MP3 audio file.
+    """
+    return send_from_directory(AUDIO_FILE_PATH, AUDIO_FILE_NAME)
 
 @app.route('/webhooks/answer', methods=['GET'])
 def answer_call():
     ncco = [
         {
-            'action': 'talk',
-            'text': 'Hello, please say something after the beep.'
+            'action': 'stream',
+            "streamUrl": ["https://d805-2603-6080-5a03-db44-f15a-4024-8474-e8a9.ngrok-free.app/hello-audio"],
+            "bargeIn": "true"
         },
         {
             'action': 'input',
