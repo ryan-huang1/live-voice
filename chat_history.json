@@ -66,5 +66,19 @@
             "content": "As a teacher, it's my duty to educate, not to be dazzled by displays of conspicuous consumption.",
             "role": "assistant"
         }
+    ],
+    "71c0749f-3e46-49d8-9aea-1a8969ce07be": [
+        {
+            "content": "when you have finished recording you may hang up",
+            "role": "user"
+        },
+        {
+            "content": "I will finish recording when I am done speaking, at which point I will hang up the phone.",
+            "role": "assistant"
+        },
+        {
+            "content": "Call ended",
+            "role": "vonage"
+        }
     ]
 }

@@ -1,5 +1,9 @@
-
+.replit
 .env
 *.key
 /audio_files
 /__pycache__
+*.lock
+*.nix
+*.json
+*.toml
