@@ -33,5 +33,5 @@ def get_groq_response(user_question):
 
 # Example usage:
 question = "Hi, how are you doing today?"
-response = get_groq_response(question)
-print(response)
+# response = get_groq_response(question)
+# print(response)

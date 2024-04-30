@@ -34,7 +34,14 @@ def serve_audio(filename):
 
 @app.route('/webhooks/answer', methods=['GET'])
 def answer_call():
-    # Generate a new audio file
+    # Logging the request details
+    print("Received GET request for /webhooks/answer")
+    print("Headers:", request.headers)
+    print("Query Parameters:", request.args)
+    # Specifically log the conversation's UUID
+    conversation_uuid = request.args.get('conversation_uuid')
+    print(f"Conversation UUID: {conversation_uuid}")
+    
     text_to_convert = "Hi i'm mr ingram, lets have a conversation!!"
     audio_filename = generate_audio_file(text_to_convert, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
@@ -65,7 +72,11 @@ def events():
 
 @app.route('/webhooks/input', methods=['POST'])
 def handle_input():
-    print("Input received:", request.json)
+    input_data = request.json
+    print("Input received:", input_data)
+    uuid = input_data.get('uuid', 'No UUID found')
+    print("UUID:", uuid)
+
     speech_results = request.json.get('speech', {}).get('results', [])
     question = get_groq_response(speech_results[0].get("text"))
     audio_filename = generate_audio_file(question, AUDIO_FILE_PATH)
