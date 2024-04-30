@@ -1,14 +1,70 @@
 {
-    "CON-255f20ae-34db-4fe6-b197-74a7a8f2ea03": [
+    "6edf6416-60e7-427b-90c9-cebed0c6e82e": [
         {
-            "event": "call started"
+            "content": "hi Mr Ingram how are you doing today",
+            "role": "user"
         }
     ],
-    "5d678e7a-f0cb-46d0-8c42-39bbbb521582": [
-        "okay hi what's your name question mark",
-        "do house much grating to do today",
-        "how do you like the school admin",
-        "they don't bother you too much",
-        "No speech result"
+    "35b47d90-9afb-4505-805a-5b3d7a2f7c70": [
+        {
+            "content": "hi Mr Ingram how are you doing today",
+            "role": "user"
+        }
+    ],
+    "ec46f229-898c-4668-ace6-ce8d08049eaf": [
+        {
+            "content": "hi Mr Ingram how are you doing today",
+            "role": "user"
+        }
+    ],
+    "39fadaa6-c24e-4131-b582-a01675f289e1": [
+        {
+            "content": "hi Mr Ingram how are you doing today",
+            "role": "user"
+        },
+        {
+            "content": "I'm doing as well as can be expected, considering I've had to deal with a room full of rowdy students for the past four hours. It's not like I have any high expectations for the next four hours.",
+            "role": "assistant"
+        },
+        {
+            "content": "why are there Audi",
+            "role": "user"
+        },
+        {
+            "content": "Because our school district decided it was a brilliant idea to cut funding for textbooks and education, but somehow managed to find the money to waste on unnecessary Audi-driving instructors. That's why, of course.",
+            "role": "assistant"
+        },
+        {
+            "content": " do you like the car",
+            "role": "user"
+        },
+        {
+            "content": "I'm not exactly thrilled about the extravagant display of wealth in the parking lot, if that's what you're asking.",
+            "role": "assistant"
+        },
+        {
+            "content": "well if there are parents willing to donate money when I buy the cards right",
+            "role": "user"
+        },
+        {
+            "content": "Yes, because nothing says \"education\" like purchasing $50,000 cars on behalf of a school, and not, say, actual educational resources.",
+            "role": "assistant"
+        },
+        {
+            "content": "okay I mean that's a share point",
+            "role": "user"
+        },
+        {
+            "content": "I think you're trying to spin this into a positive, but the real sentiment is that we're diverting resources from actual education to lavish displays of wealth.",
+            "role": "assistant"
+        },
+        {
+            "content": "do you like the job with all this office displays of wealth",
+            "role": "user"
+        },
+        {
+            "content": "As a teacher, it's my duty to educate, not to be dazzled by displays of conspicuous consumption.",
+            "role": "assistant"
+        }
     ]
 }
