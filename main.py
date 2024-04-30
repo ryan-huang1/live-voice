@@ -3,6 +3,7 @@ import json
 import vonage
 from dotenv import load_dotenv
 import os
+from voice import generate_audio_file  # Importing from 11labs.py
 
 app = Flask(__name__)
 
@@ -14,6 +15,8 @@ VONAGE_APPLICATION_ID = os.getenv('VONAGE_APPLICATION_ID')
 API_KEY_PATH = os.getenv('API_KEY_PATH')
 TO_NUMBER = os.getenv('TO_NUMBER')
 VONAGE_NUMBER = os.getenv('VONAGE_NUMBER')
+AUDIO_FILE_PATH = os.getenv('AUDIO_FILE_PATH')
+server_remote_url = os.getenv('SERVER_REMOTE_URL')
 
 # Vonage Client Setup
 client = vonage.Client(
@@ -21,25 +24,24 @@ client = vonage.Client(
     private_key=API_KEY_PATH,
 )
 
-server_remote_url = "https://d805-2603-6080-5a03-db44-f15a-4024-8474-e8a9.ngrok-free.app/"
-
-# Define the path to your MP3 file and its directory
-AUDIO_FILE_PATH = '/Users/ryanhuang/Documents/GitHub/live-voice/audio_files'
-AUDIO_FILE_NAME = '127b95ac-dcec-497f-a9a8-f753d3940d8c.mp3'
-
-@app.route('/hello-audio')
-def serve_audio():
+@app.route('/hello-audio/<filename>')
+def serve_audio(filename):
     """
-    Serve the MP3 audio file.
+    Serve the dynamically generated MP3 audio file.
     """
-    return send_from_directory(AUDIO_FILE_PATH, AUDIO_FILE_NAME)
+    return send_from_directory(AUDIO_FILE_PATH, filename)
 
 @app.route('/webhooks/answer', methods=['GET'])
 def answer_call():
+    # Generate a new audio file
+    text_to_convert = "Please hold while we connect your call. My name is Mr Ingram, and im going to speak to you!!!!"
+    audio_filename = generate_audio_file(text_to_convert, AUDIO_FILE_PATH)
+    audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
+
     ncco = [
         {
             'action': 'stream',
-            "streamUrl": ["https://d805-2603-6080-5a03-db44-f15a-4024-8474-e8a9.ngrok-free.app/hello-audio"],
+            "streamUrl": [audio_url],
             "bargeIn": "true"
         },
         {
@@ -54,7 +56,6 @@ def answer_call():
         }
     ]
     return Response(json.dumps(ncco), mimetype='application/json')
-
 
 @app.route('/webhooks/event', methods=['POST'])
 def events():

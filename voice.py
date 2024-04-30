@@ -2,8 +2,9 @@ from elevenlabs.client import ElevenLabs
 from elevenlabs import Voice, VoiceSettings
 from dotenv import load_dotenv
 import os
-import wave
-import uuid  # For generating unique file names
+import uuid
+import io
+from pydub import AudioSegment  # For audio format conversion
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,7 +17,7 @@ client = ElevenLabs(api_key=api_key)
 
 def generate_audio_file(text, directory='audio_files'):
     """
-    Generates an audio file from the provided text using ElevenLabs API and saves it in the specified directory.
+    Generates an MP3 audio file from the provided text using ElevenLabs API and saves it in the specified directory.
     
     Args:
     text (str): The text to be converted to speech.
@@ -30,7 +31,7 @@ def generate_audio_file(text, directory='audio_files'):
         os.makedirs(directory)
 
     # Generate a random UUID for the filename
-    filename = f"{uuid.uuid4()}.wav"
+    filename = f"{uuid.uuid4()}.mp3"
     filepath = os.path.join(directory, filename)
 
     # Generate the audio content
@@ -43,18 +44,21 @@ def generate_audio_file(text, directory='audio_files'):
         )
     )
 
-    # Save the audio to a file
-    with wave.open(filepath, 'wb') as f:
-        f.setnchannels(1)  # Mono channel
-        f.setsampwidth(2)  # Sample width in bytes
-        f.setframerate(24000)  # Frame rate
-        
-        for chunk in audio_generator:
-            f.writeframes(chunk)
+    # Collect all audio data into a byte array
+    audio_data = bytes()
+    for chunk in audio_generator:
+        audio_data += chunk
 
-    return filepath
+    # Load the audio data into AudioSegment and export it as MP3
+    try:
+        sound = AudioSegment.from_raw(io.BytesIO(audio_data), sample_width=2, frame_rate=24000, channels=1)
+        sound.export(filepath, format="mp3")
+    except Exception as e:
+        print(f"Failed to process audio data: {e}")
+
+    return filename
 
 # Example usage
 text_to_convert = '''In the heart of an ancient forest, a curious phenomenon occurs each year on the eve of the autumn equinox.'''
-audio_filepath = generate_audio_file(text_to_convert)
-print(f"Audio file saved as {audio_filepath}")
+# audio_filename = generate_audio_file(text_to_convert)
+# print(f"Audio file saved as {audio_filename}")
