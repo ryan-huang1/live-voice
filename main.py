@@ -67,8 +67,14 @@ def handle_input():
     print("Input received:", request.json)
     speech_results = request.json.get('speech', {}).get('results', [])
     response_text = 'You said nothing recognizable.' if not speech_results else f'You said: {speech_results[0].get("text")}. Please say something else.'
+    audio_filename = generate_audio_file(response_text, AUDIO_FILE_PATH)
+    audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
     response_ncco = [
-        {'action': 'talk', 'text': response_text},
+        {
+            'action': 'stream',
+            "streamUrl": [audio_url],
+            "bargeIn": "true"
+        },
         {
             'action': 'input',
             'eventUrl': [f"{server_remote_url}webhooks/input"],
