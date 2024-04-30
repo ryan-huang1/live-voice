@@ -3,6 +3,7 @@ import json
 import vonage
 from dotenv import load_dotenv
 from llm import get_groq_response
+from helper import manage_chat_history
 import os
 from voice import generate_audio_file  # Importing from 11labs.py
 
@@ -40,8 +41,10 @@ def answer_call():
     print("Query Parameters:", request.args)
     # Specifically log the conversation's UUID
     conversation_uuid = request.args.get('conversation_uuid')
+    manage_chat_history(conversation_uuid, {"event": "call started"})
+
     print(f"Conversation UUID: {conversation_uuid}")
-    
+
     text_to_convert = "Hi i'm mr ingram, lets have a conversation!!"
     audio_filename = generate_audio_file(text_to_convert, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
@@ -77,7 +80,16 @@ def handle_input():
     uuid = input_data.get('uuid', 'No UUID found')
     print("UUID:", uuid)
 
-    speech_results = request.json.get('speech', {}).get('results', [])
+    # Extracting the highest confidence result text
+    speech_results = input_data.get('speech', {}).get('results', [])
+    if speech_results:
+        highest_confidence_result = max(speech_results, key=lambda result: result.get('confidence', 0))
+        text = highest_confidence_result.get('text', '')
+        manage_chat_history(uuid, text)
+    else:
+        text = "No speech result"
+        manage_chat_history(uuid, text)
+
     question = get_groq_response(speech_results[0].get("text"))
     audio_filename = generate_audio_file(question, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"

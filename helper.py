@@ -3,7 +3,7 @@ import json
 
 lock = threading.Lock()
 
-def manage_chat_history(uuid, update=None):
+def manage_chat_history(uuid, text):
     with lock:
         try:
             with open('chat_history.json', 'r') as file:
@@ -11,13 +11,10 @@ def manage_chat_history(uuid, update=None):
         except (FileNotFoundError, json.JSONDecodeError):
             chat_history = {}
         
-        if update:
-            if uuid in chat_history:
-                chat_history[uuid].append(update)
-            else:
-                chat_history[uuid] = [update]
+        if uuid in chat_history:
+            chat_history[uuid].append(text)
+        else:
+            chat_history[uuid] = [text]
         
-            with open('chat_history.json', 'w') as file:
-                json.dump(chat_history, file, indent=4)
-        
-        return chat_history.get(uuid, [])
+        with open('chat_history.json', 'w') as file:
+            json.dump(chat_history, file, indent=4)
