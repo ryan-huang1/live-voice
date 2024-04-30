@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, Response, send_from_directory
 import json
 import vonage
 from dotenv import load_dotenv
+from llm import get_groq_response
 import os
 from voice import generate_audio_file  # Importing from 11labs.py
 
@@ -34,7 +35,7 @@ def serve_audio(filename):
 @app.route('/webhooks/answer', methods=['GET'])
 def answer_call():
     # Generate a new audio file
-    text_to_convert = "Please hold while we connect your call. My name is Mr Ingram, and im going to speak to you!!!!"
+    text_to_convert = "Hi i'm mr ingram, lets have a conversation!!"
     audio_filename = generate_audio_file(text_to_convert, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
 
@@ -50,7 +51,7 @@ def answer_call():
             'type': ['speech'],
             'speech': {
                 'uuid': [request.args.get('uuid')],
-                'endOnSilence': 3,
+                'endOnSilence': 1,
                 'language': 'en-US'
             }
         }
@@ -66,8 +67,8 @@ def events():
 def handle_input():
     print("Input received:", request.json)
     speech_results = request.json.get('speech', {}).get('results', [])
-    response_text = 'You said nothing recognizable.' if not speech_results else f'You said: {speech_results[0].get("text")}. Please say something else.'
-    audio_filename = generate_audio_file(response_text, AUDIO_FILE_PATH)
+    question = get_groq_response(speech_results[0].get("text"))
+    audio_filename = generate_audio_file(question, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
     response_ncco = [
         {
