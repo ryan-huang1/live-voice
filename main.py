@@ -38,7 +38,7 @@ def answer_call():
     # Logging the request details
     print("Received GET request for /webhooks/answer")
 
-    text_to_convert = "Hi i'm mr ingram, lets have a conversation!!"
+    text_to_convert = "Hello? Is that you calling? I'm so happy to hear from you! I'm really sorry, but can you remind me of your name? I’ve been thinking about you every day, and I want to hear all about how you've been doing."
     audio_filename = generate_audio_file(text_to_convert, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
 
@@ -55,6 +55,7 @@ def answer_call():
             'speech': {
                 'uuid': [request.args.get('uuid')],
                 'endOnSilence': 1,
+                'sensitivity': '50',
                 'language': 'en-US'
             }
         }
@@ -81,7 +82,7 @@ def handle_input():
         manage_chat_history(uuid, user_text, "user")
     else:
         user_text = "Call ended"
-        manage_chat_history(uuid, user_text, "vonage")
+        manage_chat_history(uuid, user_text, "assistant")
 
     # Get system response
     system_response = get_groq_response(get_chat_history(uuid))
@@ -101,7 +102,8 @@ def handle_input():
             'type': ['speech'],
             'speech': {
                 'uuid': [request.json['uuid']],
-                'endOnSilence': 3,
+                'endOnSilence': 1,
+                'sensitivity': '50',
                 'language': 'en-US'
             }
         }
