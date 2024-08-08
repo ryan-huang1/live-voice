@@ -39,7 +39,7 @@ def generate_audio_file(text, directory='audio_files'):
     audio_generator = client.generate(
         model="eleven_turbo_v2_5",
         text=text,
-        voice=Voice(voice_id='pVbJHtbGvAJmXALcYry9',
+        voice=Voice(voice_id='eVItLK1UvXctxuaRV2Oq',
                     settings=VoiceSettings(stability=0.71,
                                            similarity_boost=0.5,
                                            style=0.0,
