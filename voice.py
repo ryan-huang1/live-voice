@@ -15,6 +15,7 @@ api_key = os.getenv('11LABS_API_KEY')
 # Initialize the ElevenLabs client
 client = ElevenLabs(api_key=api_key)
 
+
 def generate_audio_file(text, directory='audio_files'):
     """
     Generates an MP3 audio file from the provided text using ElevenLabs API and saves it in the specified directory.
@@ -36,13 +37,13 @@ def generate_audio_file(text, directory='audio_files'):
 
     # Generate the audio content
     audio_generator = client.generate(
-        model="eleven_turbo_v2",
+        model="eleven_turbo_v2_5",
         text=text,
-        voice=Voice(
-            voice_id='pVbJHtbGvAJmXALcYry9',
-            settings=VoiceSettings(stability=0.71, similarity_boost=0.5, style=0.0, use_speaker_boost=True)
-        )
-    )
+        voice=Voice(voice_id='pVbJHtbGvAJmXALcYry9',
+                    settings=VoiceSettings(stability=0.71,
+                                           similarity_boost=0.5,
+                                           style=0.0,
+                                           use_speaker_boost=True)))
 
     # Collect all audio data into a byte array
     audio_data = bytes()
@@ -51,12 +52,16 @@ def generate_audio_file(text, directory='audio_files'):
 
     # Load the audio data into AudioSegment and export it as MP3
     try:
-        sound = AudioSegment.from_raw(io.BytesIO(audio_data), sample_width=2, frame_rate=24000, channels=1)
+        sound = AudioSegment.from_raw(io.BytesIO(audio_data),
+                                      sample_width=2,
+                                      frame_rate=24000,
+                                      channels=1)
         sound.export(filepath, format="mp3")
     except Exception as e:
         print(f"Failed to process audio data: {e}")
 
     return filename
+
 
 # Example usage
 text_to_convert = '''In the heart of an ancient forest, a curious phenomenon occurs each year on the eve of the autumn equinox.'''
