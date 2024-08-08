@@ -55,7 +55,7 @@ def answer_call():
             'speech': {
                 'uuid': [request.args.get('uuid')],
                 'endOnSilence': 1,
-                'sensitivity': '50',
+                'sensitivity': '10',
                 'language': 'en-US'
             }
         }
@@ -103,7 +103,7 @@ def handle_input():
             'speech': {
                 'uuid': [request.json['uuid']],
                 'endOnSilence': 1,
-                'sensitivity': '50',
+                'sensitivity': '10',
                 'language': 'en-US'
             }
         }
