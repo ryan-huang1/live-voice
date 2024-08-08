@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from llm import get_groq_response
 from helper import manage_chat_history, get_chat_history
 import os
-from voice import generate_audio_file  # Importing from 11labs.py
+from voice import generate_audio_file
 
 app = Flask(__name__)
 
@@ -35,31 +35,27 @@ def serve_audio(filename):
 
 @app.route('/webhooks/answer', methods=['GET'])
 def answer_call():
-    # Logging the request details
     print("Received GET request for /webhooks/answer")
 
-    text_to_convert = "Hello? Is that you calling? I'm so happy to hear from you! I'm really sorry, but can you remind me of your name? I’ve been thinking about you every day, and I want to hear all about how you've been doing."
+    text_to_convert = "Hello? Is that you calling? I'm so happy to hear from you! I'm really sorry, but can you remind me of your name? I've been thinking about you every day, and I want to hear all about how you've been doing."
     audio_filename = generate_audio_file(text_to_convert, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
 
-    ncco = [
-        {
-            'action': 'stream',
-            "streamUrl": [audio_url],
-            "bargeIn": "true"
-        },
-        {
-            'action': 'input',
-            'eventUrl': [f"{server_remote_url}webhooks/input"],
-            'type': ['speech'],
-            'speech': {
-                'uuid': [request.args.get('uuid')],
-                'endOnSilence': 1,
-                'sensitivity': '10',
-                'language': 'en-US'
-            }
+    ncco = [{
+        'action': 'stream',
+        "streamUrl": [audio_url],
+        "bargeIn": "true"
+    }, {
+        'action': 'input',
+        'eventUrl': [f"{server_remote_url}webhooks/input"],
+        'type': ['speech'],
+        'speech': {
+            'uuid': [request.args.get('uuid')],
+            'endOnSilence': 1,
+            'sensitivity': '10',
+            'language': 'en-US'
         }
-    ]
+    }]
     return Response(json.dumps(ncco), mimetype='application/json')
 
 @app.route('/webhooks/event', methods=['POST'])
@@ -74,10 +70,10 @@ def handle_input():
     uuid = input_data.get('uuid', 'No UUID found')
     print("UUID:", uuid)
 
-    # Extracting the highest confidence result text
     speech_results = input_data.get('speech', {}).get('results', [])
     if speech_results:
-        highest_confidence_result = max(speech_results, key=lambda result: result.get('confidence', 0))
+        highest_confidence_result = max(
+            speech_results, key=lambda result: result.get('confidence', 0))
         user_text = highest_confidence_result.get('text', '')
         manage_chat_history(uuid, user_text, "user")
     else:
@@ -90,34 +86,36 @@ def handle_input():
 
     audio_filename = generate_audio_file(system_response, AUDIO_FILE_PATH)
     audio_url = f"{server_remote_url}hello-audio/{audio_filename}"
-    response_ncco = [
-        {
-            'action': 'stream',
-            "streamUrl": [audio_url],
-            "bargeIn": "true"
-        },
-        {
-            'action': 'input',
-            'eventUrl': [f"{server_remote_url}webhooks/input"],
-            'type': ['speech'],
-            'speech': {
-                'uuid': [request.json['uuid']],
-                'endOnSilence': 1,
-                'sensitivity': '10',
-                'language': 'en-US'
-            }
+    response_ncco = [{
+        'action': 'stream',
+        "streamUrl": [audio_url],
+        "bargeIn": "true"
+    }, {
+        'action': 'input',
+        'eventUrl': [f"{server_remote_url}webhooks/input"],
+        'type': ['speech'],
+        'speech': {
+            'uuid': [request.json['uuid']],
+            'endOnSilence': 1,
+            'sensitivity': '10',
+            'language': 'en-US'
         }
-    ]
+    }]
     return jsonify(response_ncco)
 
 @app.route('/make-call', methods=['GET'])
 def make_call():
     response = client.voice.create_call({
-        'to': [{'type': 'phone', 'number': TO_NUMBER}],
-        'from': {'type': 'phone', 'number': VONAGE_NUMBER},
+        'to': [{
+            'type': 'phone',
+            'number': TO_NUMBER
+        }],
+        'from': {
+            'type': 'phone',
+            'number': VONAGE_NUMBER
+        },
         'answer_url': [f"{server_remote_url}webhooks/answer"]
     })
-    # Extract the UUID from the response and print it
     uuid = response['uuid']
     print(uuid)
     return f"Call initiated with UUID: {uuid}", 200
